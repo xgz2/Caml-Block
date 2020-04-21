@@ -18,18 +18,7 @@ type block =
   | Empty
   | Block of color * h_off * v_off
 
-(** Type of a shape placement grid. *)
-module Grid = struct
-  type t = (block array) array
-  let make c 
-      x0y0 x1y0 x2y0 x3y0 x4y0 x5y0 
-      x0y1 x1y1 x2y1 x3y1 x4y1 x5y0 
-      x0y2 x1y2 x2y2 x3y2 x4y2 x5y2
-      x0y3 x1y3 x2y3 x3y3 x4y3 x5y3
-      x0y4 x1y4 x2y4 x3y4 x4y4 x5y4 = 
-
     (** Type of a playable shape. *)
-    (* add Color *)
   type shape = 
     (* color 1 *)
     | OneByOne of color
