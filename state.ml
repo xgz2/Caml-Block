@@ -2,12 +2,16 @@ open Shape
 
 type score = int
 
-type board = ((bool * string) array) array
+type board = (block array) array
 
-type shape_queue = Shape.shape * Shape.shape * Shape.shape
+let shape_array =  
 
-type state = board * score * shape_queue
+module shape_queue = struct
+ type t = Shape.shape * Shape.shape * Shape.shape
+ let rand_shape = 
 
-let init_state = 
+type state = score * board * shape_queue
+
+let init_state = (0, Array.make_matrix 10 10 Empty, )
 
 let print_state s = 

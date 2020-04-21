@@ -1,3 +1,4 @@
+(** Type of colors. *)
 type color = 
    | Blue
    | Green
@@ -7,53 +8,89 @@ type color =
    | Purple 
    | Brown
 
+(** Type of horizontal offset. *)
 type h_off = int
+(** Type of vertical offset. *)
 type v_off = int
 
+(** Type of a singular board block. *)
 type block = 
    | Empty
    | Block of color * h_off * v_off
 
+(** Type of a shape placement grid. *)
 type grid = (block array) array
 
-(* https://ocaml.org/learn/tutorials/99problems.html *)
-
+(** Type of a playable shape. *)
+(* add Color *)
 type shape = 
 (* color 1 *)
-  | OneByOne of grid
-  | TwoByTwo of grid
-  | ThreeByThree of grid
+  | OneByOne of color
+  | TwoByTwo of color
+  | ThreeByThree of color
 (* color 2 *)
-  | OneByTwo of grid
-  | TwoByOne of grid
+  | OneByTwo of color
+  | TwoByOne of color
 (* color 3 *)
-  | OneByThree of grid
-  | ThreeByOne of grid
+  | OneByThree of color
+  | ThreeByOne of color
 (* color 4 *)
-  | OneByFour of grid
-  | FourByOne of grid
+  | OneByFour of color
+  | FourByOne of color
 (* color 5 *)
-  | OneByFive of grid
-  | FiveByOne of grid
+  | OneByFive of color
+  | FiveByOne of color
 (* color 6 *)
-  | SymmetricalLTwoR1 of grid
-  | SymmetricalLTwoR2 of grid
-  | SymmetricalLTwoR3 of grid 
-  | SymmetricalLTwoR4 of grid
+  | SymmetricalLTwoR1 of color
+  | SymmetricalLTwoR2 of color
+  | SymmetricalLTwoR3  of color
+  | SymmetricalLTwoR4 of color
 (* color 7 *)
-  | SymmetricalLThreeR1 of grid
-  | SymmetricalLThreeR2 of grid
-  | SymmetricalLThreeR3 of grid
-  | SymmetricalLThreeR4 of grid
+  | SymmetricalLThreeR1 of color
+  | SymmetricalLThreeR2 of color
+  | SymmetricalLThreeR3 of color
+  | SymmetricalLThreeR4 of color
 
+[[Empty;Empty;Empty;Empty;Empty];
+[Empty;Empty;Empty;Empty;Empty];
+[Empty;Empty;Empty;Empty;Empty];
+[Empty;Empty;Empty;Empty;Empty];
+[Empty;Empty;Empty;Empty;Empty]]
 
+let grid_of_shape = function
+  | OneByOne c -> Array.of_list 
+  [[Block(c,0,0);Empty;Empty;Empty;Empty];
+  [Empty;Empty;Empty;Empty;Empty];
+  [Empty;Empty;Empty;Empty;Empty];
+  [Empty;Empty;Empty;Empty;Empty];
+  [Empty;Empty;Empty;Empty;Empty]]
+  | TwoByTwo c > Array.of_list 
+  | ThreeByThree 
+  | OneByTwo c
+  | TwoByOne c
+  | OneByThree c
+  | ThreeByOne c
+  | OneByFour c
+  | FourByOne c
+  | OneByFive c
+  | FiveByOne c
+  | SymmetricalLTwoR1 c
+  | SymmetricalLTwoR2 c
+  | SymmetricalLTwoR3 c
+  | SymmetricalLTwoR4 c
+  | SymmetricalLThreeR1 c -> Array.of_list [[Block(c,0,0);Empty;Empty];[Block(c, )] ]
+  | SymmetricalLThreeR2 c
+  | SymmetricalLThreeR3 c
+  | SymmetricalLThreeR4 c -> Array.of_list []
+
+[[c1,c2],[2rc1,c2],[]]
 
 
 (* 3x3, , , symmetrical L shape with length 3 in all four rotations, 
    symmetrical L shape with length 2 in all four rotations, 
    4x1, 5x1 *)
 
-
+(* https://ocaml.org/learn/tutorials/99problems.html *)
 (* http://www.unicode.org/emoji/charts/emoji-list.html *)
 (* https://github.com/fxfactorial/ocaml-emoji *)
 (* https://hyegar.com/ocaml-emoji/ *)
