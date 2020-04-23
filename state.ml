@@ -78,7 +78,7 @@ module ShapeQueue : ShapeQueueSig = struct
     | _ -> failwith "ShapeQueue Error: Empty ShapeQueue"
 end
 
-type t = {
+type state = {
   current_score : score;
   current_board : Board.t;
   current_queue: ShapeQueue.t;

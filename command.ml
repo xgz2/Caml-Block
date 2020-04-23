@@ -1,9 +1,11 @@
 open Shape
 open State
 
+type command_phrase = string
+
 type command = 
-  | Place of 
-      | Quit
+  | Place of command_phrase
+  | Quit
 
 exception Empty
 
@@ -25,8 +27,8 @@ let parse str =
   (* let word_list = String.split_on_char ' ' str in *)
   match word_list with
   | [] -> raise Empty
-  | "go"::[] -> raise Malformed
-  | "go"::t -> Go (t)
+  | "place"::[] -> raise Malformed
+  | "place"::t -> Go (t)
   | "quit"::[] -> Quit
   | _ -> raise Malformed
 
