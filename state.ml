@@ -4,6 +4,8 @@ type score = int
 
 type coord = int * int
 
+exception InvalidPlacement
+
 module type BoardSig = sig
   type t 
   val init_board : t
@@ -51,12 +53,16 @@ module Board : BoardSig = struct
       | Empty -> failwith "Imposible"
 
   let rec place_shape brd original_brd shape_blocks loc =
-    match shape_blocks with
-    | [] -> brd
-    | x::s -> if check_block brd x loc 
-      then place_shape (edit_board brd x loc) original_brd s loc 
-      else original_brd
-end
+    try 
+      (match shape_blocks with
+       | [] -> brd
+       | x::s -> 
+         if check_block brd x loc 
+         then place_shape (edit_board brd x loc) original_brd s loc 
+         else original_brd)
+    with Invalid_argument _ -> raise InvalidPlacement
+
+end 
 
 module type ShapeQueueSig = sig
   type t
@@ -98,5 +104,16 @@ let board_from_state st =
 
 let queue_from_state st = 
   st.current_queue
+
+type result = Legal of state | Illegal
+
+let step_place st shp loc =
+  try
+    let new_board = Board.place_shape (board_from_state st) 
+        (board_from_state st) (blocks_of_shape shp) loc in
+    let new_queue = ShapeQueue.replace (queue_from_state st) in
+    Legal {current_score = score_from_state st; 
+           current_board = new_board; current_queue = new_queue;}
+  with InvalidPlacement -> Illegal
 
 

@@ -36,3 +36,7 @@ val score_from_state : state -> score
 val board_from_state : state -> Board.t
 
 val queue_from_state : state -> ShapeQueue.t
+
+type result = Legal of state | Illegal
+
+val step_place : state -> shape -> coord -> result
