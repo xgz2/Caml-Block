@@ -1,45 +1,39 @@
+(** Type of colors. *)
 type color = 
-   | Blue
-   | Green
-   | Red
-   | Orange
-   | Yellow
-   | Purple 
-   | Brown
+  | Blue
+  | Green
+  | Red
+  | Orange
+  | Yellow
+  | Purple 
+  | Brown
 
+(** Type of horizontal offset. *)
 type h_off = int
+(** Type of vertical offset. *)
 type v_off = int
 
+(** Type of a singular board block. *)
 type block = 
-   | Empty
-   | Block of color * h_off * v_off
+  | Empty
+  | Block of color * h_off * v_off
 
-type grid = (block array) array 
-
+(** Type of a playable shape. *)
 type shape = 
+  | OneByOne  
+  | TwoByTwo  
+  | ThreeByThree  
+  | OneByTwo  
+  | TwoByOne  
+  | OneByThree  
+  | ThreeByOne  
+  | OneByFour  
+  | FourByOne  
+  | OneByFive  
+  | FiveByOne  
+  | SymmetricalLTwo  
+  | SymmetricalLThree 
 
-  | OneByOne of grid
-  | TwoByTwo of grid
-  | ThreeByThree of grid
+val rand_shape : unit -> shape
 
-  | OneByTwo of grid
-  | TwoByOne of grid
-
-  | OneByThree of grid
-  | ThreeByOne of grid
-
-  | OneByFour of grid
-  | FourByOne of grid
-
-  | OneByFive of grid
-  | FiveByOne of grid
-
-  | SymmetricalLTwoR1 of grid
-  | SymmetricalLTwoR2 of grid
-  | SymmetricalLTwoR3 of grid 
-  | SymmetricalLTwoR4 of grid
-  
-  | SymmetricalLThreeR1 of grid
-  | SymmetricalLThreeR2 of grid
-  | SymmetricalLThreeR3 of grid
-  | SymmetricalLThreeR4 of grid
+val blocks_of_shape : shape -> block list
