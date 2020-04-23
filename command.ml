@@ -1,7 +1,7 @@
 open Shape
 open State
 
-type command_phrase = string
+type command_phrase = string list
 
 type command = 
   | Place of command_phrase
@@ -21,14 +21,12 @@ exception Malformed
     or 2) if verb is "quit" with some object phrase, 
     or 3) if verb is "go" but there is no object-phrase. *)
 let parse str =
-  let trim_word = String.trim str in
-  let word_list_with_space = String.split_on_char ' ' trim_word in
-  let word_list = List.filter (fun x ->  x <> "") word_list_with_space in
-  (* let word_list = String.split_on_char ' ' str in *)
+  let word_list = str |> String.trim |> String.split_on_char ' ' 
+                  |> List.filter (fun x ->  x <> "") in
+  let list_length = List.length word_list in
   match word_list with
   | [] -> raise Empty
-  | "place"::[] -> raise Malformed
-  | "place"::t -> Go (t)
-  | "quit"::[] -> Quit
-  | _ -> raise Malformed
-
+  | h::t ->
+    if h = "place" && list_length = 3 then Place t
+    else if h = "quit" && list_length = 1 then Quit
+    else raise Malformed
