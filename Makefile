@@ -15,8 +15,8 @@ build:
 test:
 	$(OCAMLBUILD) -tag 'debug' $(TEST) && ./$(TEST)
 
-# play:
-# 	$(OCAMLBUILD) $(MAIN) && ./$(MAIN)
+play:
+	$(OCAMLBUILD) $(MAIN) && ./$(MAIN)
 
 check:
 	bash checkenv.sh && bash checktypes.sh

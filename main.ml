@@ -4,7 +4,6 @@ open Command
 
 
 let rec repl st =
-  (* ANSITerminal. *)
   Stdlib.print_string("\nEnter a command: ");
   let parsed_command : Command.command = try (read_line() |> Command.parse)
     with
@@ -23,43 +22,23 @@ let rec repl st =
     | Illegal -> print_endline "Illegal coordinates. Please try again."; 
       repl st
 
-(* let rec continued json st =
-   ANSITerminal.(print_endline 
-                  (st |> current_room_id 
-                   |> description json));
-   Stdlib.print_string ("\nEnter a command: ");
-   try (match (read_line()) |> parse with
-      |Quit -> print_endline "Thanks for playing!"; exit 0
-      |Go object_phrase -> begin
-          match (go (String.concat " " object_phrase) json st) with
-          | Legal new_ -> continued json new_
-          | Illegal -> print_endline "Please enter a valid exit."; continued json st
-        end)
-   with 
-   | Empty -> print_endline "Please enter a non-empty exit."; continued json st
-   | Malformed -> print_endline "Please enter a non-empty exit."; continued json st
-   (** [play_game f] starts the adventure in file [f]. *)
-   let play_game f =
-   let json = Adventure.from_json (Yojson.Basic.from_file f) in 
-   let init_state = State.init_state(json) in
-   (* let score = 0 in *)
-   continued json init_state
-   (* Stdlib.print_string (Adventure.description json (Adventure.start_room json));
-   Stdlib.print_string ("\nItems: ");
-   Stdlib.print_string (Adventure.items j (State.current_room_id st));
-   Stdlib.print_string ("\nPlease enter a command: "); *)
-
-   continue_game json init_state score *)
-
+let parse_start () =
+  print_endline "Would you like to begin now (y/n)? _>";
+  let response = read_line() in
+  if response = "y" then print_string "Great!"
+  else print_string "ok"; exit 0
 
 let main () =
   ANSITerminal.(print_string [red]
-                  "\n\nWelcome to the 3110 Text Adventure Game engine.\n");
-  print_endline "Please enter the name of the game file you want to load.\n";
-  print_string  "> ";
-  match read_line () with
-  | exception End_of_file -> ()
-  | file_name -> play_game file_name
+                  "\n\nWelcome to Caml Blocks. In this game, your objective is
+                  \nto place blocks onto the game board until you fill up a row.
+                  \nUpon doing so, the row will clear and you will earn points 
+                  \nequal to the number of blocks you cleared. Note that
+                  \nwhile we show you three future shapes, you can only
+                  \nplace the left most one. When placing a shape, you will 
+                  \nspecify the location of its top left corner. Happy placing!"
+               );
+  ignore(parse_start ());
+  ignore(repl State.init_state)
 
-(* Execute the game engine. *)
 let () = main ()
