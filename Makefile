@@ -26,7 +26,7 @@ check:
 # 	bash finalcheck.sh
 
 zip:
-	zip adventure.zip *.ml* _tags Makefile
+	zip block.zip *.ml* _tags INSTALL.txt Makefile
 	
 docs: docs-public docs-private
 	
@@ -43,4 +43,4 @@ docs-private: build
 
 clean:
 	ocamlbuild -clean
-	rm -rf doc.public doc.private adventure.zip
+	rm -rf doc.public doc.private block.zip
