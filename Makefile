@@ -25,8 +25,8 @@ check:
 # 	bash checkzip.sh
 # 	bash finalcheck.sh
 
-# zip:
-# 	zip adventure.zip *.ml* *.json _tags Makefile
+zip:
+	zip adventure.zip *.ml* _tags Makefile
 	
 docs: docs-public docs-private
 	

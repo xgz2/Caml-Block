@@ -78,5 +78,13 @@ let blocks_of_shape = function
 
 let string_of_block blk =
   match blk with
-  | Empty -> "E"
-  | Block (c,_,_) -> if c = Blue then Emoji.man_facepalming else Emoji.woman
+  | Empty -> Emoji.white_circle
+  | Block (c,_,_) -> 
+    match c with
+    | Blue -> Emoji.blue_heart
+    | Green -> Emoji.green_salad
+    | Red -> Emoji.red_circle
+    | Orange -> Emoji.orange_book
+    | Yellow -> Emoji.full_moon_with_face
+    | Purple -> Emoji.purple_heart
+    | Brown -> Emoji.new_moon_face

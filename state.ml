@@ -63,8 +63,9 @@ module Board : BoardSig = struct
          else original_brd)
     with Invalid_argument _ -> raise InvalidPlacement
 
+
   let rec print_board brd row col =
-    if row >= 10 then (print_string "\n__________";)
+    if row >= 10 then (print_string "\n";)
     else if col >= 10 then 
       begin 
         print_string "\n";
@@ -85,18 +86,50 @@ module type ShapeQueueSig = sig
   val init_queue : t
   val get : t -> shape
   val replace : t -> t
+  val print_queue : t -> unit
 end
 
 module ShapeQueue : ShapeQueueSig = struct
   type t = shape list
+
   let rep_ok t = assert (List.length t = 3)
+
   let init_queue = [rand_shape (); rand_shape (); rand_shape ()]
+
   let get = function
     | x::s -> x
     | _ -> failwith "ShapeQueue Error: Empty ShapeQueue"
+
   let replace = function
     | x::s -> (rand_shape ())::(s |> List.rev) |> List.rev
     | _ -> failwith "ShapeQueue Error: Empty ShapeQueue"
+
+  let rec print_row blk_lst row col =
+    match blk_lst with
+    | [] -> ()
+    | x::s ->
+      match x with
+      | Empty -> failwith "Block was empty"
+      | Block (c, x, y) -> 
+        if y = row && x = col then 
+          (print_string (string_of_block (Block(c,x,y))); 
+           print_row s row (col +1)) 
+        else if y = row && x < col then print_row blk_lst row (col - 1)
+        else if y = row then (print_row blk_lst row (col + 1))
+        else print_row s row (col + 1)
+
+  let rec print_shape s =
+    let blocks = s |> blocks_of_shape in
+    print_row blocks 0 0; print_string "\n";
+    print_row blocks 1 0; print_string "\n";
+    print_row blocks 2 0; print_string "\n";
+    print_row blocks 3 0; print_string "\n";
+    print_row blocks 4 0
+
+  let rec print_queue t = 
+    match t with
+    | [] -> print_string "\n"
+    | x::s -> print_shape x; print_queue s 
 end
 
 type state = {

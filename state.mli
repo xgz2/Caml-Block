@@ -23,6 +23,7 @@ module type ShapeQueueSig = sig
   val init_queue : t
   val get : t -> shape
   val replace : t -> t
+  val print_queue : t -> unit
 end
 
 module ShapeQueue : ShapeQueueSig

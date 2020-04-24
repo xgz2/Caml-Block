@@ -1,0 +1,9 @@
+This instruction guide assumes the user has opam and other OCaml dependencies
+as required by CS3110 in SP20. This guide also assumes an OSX based system, 
+although the game will also be compatable with other OS systems.
+
+
+1. Run in terminal [opam update]
+2. Run in terminal [opam upgrade]
+3. Run in terminal [opam install emoji]
+4. Run [make play]

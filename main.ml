@@ -6,6 +6,8 @@ open Command
 let rec repl st =
   print_string "\n\n";
   Board.print_board (board_from_state st) 0 0;
+  print_string "\n";
+  ShapeQueue.print_queue (queue_from_state st);
   print_string "\nEnter a command: ";
   let parsed_command : Command.command = try (read_line() |> Command.parse)
     with
