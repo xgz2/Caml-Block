@@ -13,20 +13,21 @@ module type BoardSig = sig
   val edit_board : t -> block -> coord -> t
   val check_block : t -> block -> coord -> bool
   val place_shape : t -> t -> block list -> coord -> t
+  val print_board : t -> int -> int -> unit
 end
 
 module Board : BoardSig = struct
   type t = (coord * block) list
   let init_board = 
-    let rec new_board row acc =
-      let rec step_row col acc =
-        if col >= 10 then acc
-        else step_row (col + 1) (((col, row), Empty)::acc) 
+    let rec new_board row acc size =
+      let rec step_row col acc size =
+        if col >= size then acc
+        else step_row (col + 1) (((col, row), Empty)::acc) size 
       in
-      if row >= 10 then acc
-      else new_board (row + 1) ((step_row 0 []) @ acc)
+      if row >= size then acc
+      else new_board (row + 1) ((step_row 0 [] size) @ acc) size
     in
-    new_board 0 []
+    new_board 0 [] 10
 
   let block_from_location brd loc =
     List.assoc loc brd
@@ -61,6 +62,20 @@ module Board : BoardSig = struct
          then place_shape (edit_board brd x loc) original_brd s loc 
          else original_brd)
     with Invalid_argument _ -> raise InvalidPlacement
+
+  let rec print_board brd row col =
+    if row >= 10 then (print_string "\n__________";)
+    else if col >= 10 then 
+      begin 
+        print_string "\n";
+        print_board brd (row + 1) 0
+      end
+    else 
+      begin
+        let blk = block_from_location brd (col,row) |> string_of_block in
+        print_string blk; 
+        print_board brd row (col + 1)
+      end
 
 end 
 

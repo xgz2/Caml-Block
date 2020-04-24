@@ -73,3 +73,8 @@ let blocks_of_shape = function
   | SymmetricalLTwo -> [Block (Purple, 0, 0); Block (Purple, 1, 0); Block (Purple, 1, 1)]
   | SymmetricalLThree -> [Block (Brown, 0, 0); Block (Brown, 1, 0); Block (Brown, 2, 0); 
                           Block (Brown, 2, 1); Block (Brown, 2, 2)]
+
+let string_of_block blk =
+  match blk with
+  | Empty -> "E"
+  | Block (c,_,_) -> "B"

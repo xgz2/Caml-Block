@@ -37,3 +37,5 @@ type shape =
 val rand_shape : unit -> shape
 
 val blocks_of_shape : shape -> block list
+
+val string_of_block : block -> string

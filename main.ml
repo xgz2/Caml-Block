@@ -4,7 +4,9 @@ open Command
 
 
 let rec repl st =
-  Stdlib.print_string("\nEnter a command: ");
+  print_string "\n\n";
+  Board.print_board (board_from_state st) 0 0;
+  print_string "\nEnter a command: ";
   let parsed_command : Command.command = try (read_line() |> Command.parse)
     with
     | Empty -> print_endline "Please enter a non-emtpy command"; repl st
@@ -23,10 +25,11 @@ let rec repl st =
       repl st
 
 let parse_start () =
-  print_endline "Would you like to begin now (y/n)? _>";
+  print_endline "\n\nWould you like to begin now (y/n)?";
+  print_string "\n_>";
   let response = read_line() in
-  if response = "y" then print_string "Great!"
-  else print_string "ok"; exit 0
+  if response = "y" then (print_string "Great!";)
+  else (print_string "ok"; exit 0)
 
 let main () =
   ANSITerminal.(print_string [red]

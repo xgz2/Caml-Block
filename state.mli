@@ -11,6 +11,7 @@ module type BoardSig = sig
   val edit_board : t -> block -> coord -> t
   val check_block : t -> block -> coord -> bool
   val place_shape : t -> t -> block list -> coord -> t
+  val print_board : t -> int -> int -> unit
 end
 
 module Board : BoardSig
