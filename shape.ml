@@ -1,3 +1,5 @@
+open Emoji
+
 (** Type of colors. *)
 type color = 
   | Blue
@@ -77,4 +79,4 @@ let blocks_of_shape = function
 let string_of_block blk =
   match blk with
   | Empty -> "E"
-  | Block (c,_,_) -> "B"
+  | Block (c,_,_) -> if c = Blue then Emoji.man_facepalming else Emoji.woman

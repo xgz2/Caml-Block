@@ -4,3 +4,4 @@ PKG str
 PKG unix
 PKG ocamlbuild
 PKG ANSITerminal
+PKG Emoji
