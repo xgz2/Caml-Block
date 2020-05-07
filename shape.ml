@@ -72,9 +72,9 @@ let blocks_of_shape = function
                   Block (Yellow, 0, 3); Block (Yellow, 0, 4)]
   | FiveByOne -> [Block (Yellow, 0, 0); Block (Yellow, 1, 0); Block (Yellow, 2, 0); 
                   Block (Yellow, 3, 0); Block (Yellow, 4, 0)]
-  | SymmetricalLTwo -> [Block (Purple, 0, 0); Block (Purple, 1, 0); Block (Purple, 1, 1)]
-  | SymmetricalLThree -> [Block (Brown, 0, 0); Block (Brown, 1, 0); Block (Brown, 2, 0); 
-                          Block (Brown, 2, 1); Block (Brown, 2, 2)]
+  | SymmetricalLTwo -> [Block (Brown, 0, 0); Block (Brown, 0, 1); Block (Brown, 1, 1)]
+  | SymmetricalLThree -> [Block (Brown, 0, 0); Block (Brown, 0, 1); Block (Brown, 0, 2); 
+                          Block (Brown, 1, 2); Block (Brown, 2, 2)]
 
 let string_of_block blk =
   match blk with
@@ -83,7 +83,7 @@ let string_of_block blk =
     match c with
     | Blue -> Emoji.blue_heart
     | Green -> Emoji.green_salad
-    | Red -> Emoji.red_circle
+    | Red -> Emoji.red_heart
     | Orange -> Emoji.orange_book
     | Yellow -> Emoji.full_moon_with_face
     | Purple -> Emoji.purple_heart

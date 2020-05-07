@@ -1,27 +1,34 @@
 open Shape
 open State
 open Command
+open ShapeQueue
+open Board
 
 
 let rec repl st =
   print_string "\n\n";
-  Board.print_board (board_from_state st) 0 0;
+  if board_full (board_from_state st) 0 0 (st |> queue_from_state |> get) 
+  then ANSITerminal.(print_string [red] "Game Over."); ignore(exit 0);
+  print_string ("Score: " ^ (string_of_int (score_from_state st)));
+  print_string "\n\n";
+  print_board (board_from_state st) 0 0;
   print_string "\n";
-  ShapeQueue.print_queue (queue_from_state st);
+  print_queue (queue_from_state st);
   print_string "\nEnter a command: ";
-  let parsed_command : Command.command = try (read_line() |> Command.parse)
+  let parsed_command : command = try (read_line() |> parse)
     with
-    | Empty -> print_endline "Please enter a non-emtpy command"; repl st
+    | Empty -> print_endline "Please enter a non-empty command"; repl st
     | Malformed -> print_endline "Please enter a valid command"; repl st
   in
 
   match parsed_command with
   | Quit -> print_endline "Thank you for playing!"; exit 0
+  (* [coords] is guaranteed to be non-empty and of length 2. *)
   | Place coords -> 
-    let shp = st |> queue_from_state |> ShapeQueue.get in
+    let shp = st |> queue_from_state |> get in
     let x_coord = int_of_string (List.hd coords) in
     let y_coord = int_of_string (List.hd(List.tl coords)) in
-    match (State.step_place st shp (x_coord, y_coord)) with
+    match (step_place st shp (x_coord, y_coord)) with
     | Legal st' -> repl st'
     | Illegal -> print_endline "Illegal coordinates. Please try again."; 
       repl st
@@ -41,9 +48,11 @@ let main () =
                   \nequal to the number of blocks you cleared. Note that
                   \nwhile we show you three future shapes, you can only
                   \nplace the left most one. When placing a shape, you will 
-                  \nspecify the location of its top left corner. Happy placing!"
+                  \nspecify the location of its top left corner. 
+                  \nThe command to place is 'place column# row#'!
+                  \nHappy placing!"
                );
   ignore(parse_start ());
-  ignore(repl State.init_state)
+  ignore(repl init_state)
 
 let () = main ()

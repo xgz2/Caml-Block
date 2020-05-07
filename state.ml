@@ -1,4 +1,5 @@
 open Shape
+open Emoji
 
 type score = int
 
@@ -10,14 +11,19 @@ module type BoardSig = sig
   type t 
   val init_board : t
   val block_from_location : t -> coord -> block
-  val edit_board : t -> block -> coord -> t
-  val check_block : t -> block -> coord -> bool
-  val place_shape : t -> t -> block list -> coord -> t
+  val edit_block_of_board : t -> block -> coord -> t
+  val check_block_placement : t -> block -> coord -> bool
+  val place_shape : t -> block list -> coord -> t
+  val board_full : t -> int -> int -> shape -> bool
+  val clear_board : t -> coord -> int list -> int list -> int -> int -> t
+  val board_changes : t -> t -> int -> int
   val print_board : t -> int -> int -> unit
 end
 
 module Board : BoardSig = struct
+
   type t = (coord * block) list
+
   let init_board = 
     let rec new_board row acc size =
       let rec step_row col acc size =
@@ -29,46 +35,109 @@ module Board : BoardSig = struct
     in
     new_board 0 [] 10
 
+  let board_size = init_board |> List.length |> float_of_int |> sqrt |> int_of_float
+
   let block_from_location brd loc =
-    List.assoc loc brd
+    try List.assoc loc brd with Not_found -> raise InvalidPlacement
 
-  let edit_board brd block loc = 
+  let edit_block_of_board brd block loc = 
+    match loc, block with
+    | (x, y), Block (c, x_block, y_block) -> 
+      let x_val = x + x_block in
+      let y_val = y + y_block in
+      ((x_val, y_val), block)::(List.remove_assoc (x_val, y_val) brd)
+    | (x, y), Empty -> ((x,y),block)::(List.remove_assoc (x,y) brd)
+
+  let check_block_placement brd block loc =
+    match loc, block with
+    | (x, y), Block (c, x_block, y_block) -> 
+      let x_val = x + x_block in
+      let y_val = y + y_block in
+      if block_from_location brd (x_val, y_val) = Empty then true else false
+    | _, Empty -> failwith "Imposible"
+
+  let rec place_shape brd shape_blocks loc =
+    match shape_blocks with
+    | [] -> brd
+    | x::s -> 
+      if check_block_placement brd x loc 
+      then place_shape (edit_block_of_board brd x loc) s loc 
+      else raise InvalidPlacement
+
+  let rec check_shape_list brd coord shp_list =
+    match shp_list with
+    | [] -> true
+    | x::s -> if check_block_placement brd x coord 
+      then check_shape_list brd coord s 
+      else false
+
+  let rec board_full brd col row shp = 
+    let blocks = blocks_of_shape shp in
+    if col < board_size && row < board_size then 
+      try
+        if check_shape_list brd (col,row) blocks then false
+        else board_full brd (col + 1) row shp
+      with InvalidPlacement -> board_full brd (col + 1) row shp
+    else if row < board_size then
+      board_full brd 0 (row + 1) shp
+    else true
+
+  (** Requires [row] is a valid row in the board. *)
+  let check_full_row brd row =
+    if (List.length (List.filter (fun ((x, y), b) -> y = row && b <> Empty) brd) 
+        = board_size)
+    then Some row else None
+
+  let check_full_col brd col =
+    if (List.length (List.filter (fun ((x, y), b) -> x = col && b <> Empty) brd) 
+        = board_size)
+    then Some col else None
+
+  let rec clear_full_rows brd row_lst = 
+    match row_lst with
+    | [] -> brd
+    | h::t -> clear_full_rows (List.fold_left (fun acc ((x,y), b) -> 
+        if y = h then ((x,y), Empty)::acc 
+        else ((x,y),b)::acc) [] brd) t
+
+
+  let rec clear_full_cols brd col_lst = 
+    match col_lst with
+    | [] -> brd
+    | h::t -> clear_full_cols (List.fold_left (fun acc ((x,y), b) -> 
+        if x = h then ((x,y), Empty)::acc 
+        else ((x,y),b)::acc) [] brd) t
+
+
+  let rec clear_board (brd:t) (loc:coord) (col_acc:int list) (row_acc:int list) (col_n:int) (row_n:int) : t = 
     match loc with
-      (x, y) -> 
-      match block with
-      | Block (c, x_block, y_block) ->
-        let x_val = x + x_block in
-        let y_val = y + y_block in
-        ((x_val, y_val), block)::(List.remove_assoc (x_val, y_val) brd)
-      | Empty -> 
-        ((x, y), block)::(List.remove_assoc (x, y) brd)
+    | (col, row) -> 
+      if (col < board_size && col_n > 0) then
+        match check_full_col brd col with
+        | None -> clear_board brd (col + 1, row) col_acc row_acc (col_n - 1) row_n 
+        | Some c -> clear_board brd (col + 1, row) (c::col_acc) row_acc (col_n - 1) row_n 
+      else if (row < board_size && row_n > 0) then
+        match check_full_row brd row with
+        | None -> clear_board brd (col, row + 1) col_acc row_acc col_n (row_n - 1)
+        | Some r -> clear_board brd (col, row + 1) col_acc (r::row_acc) col_n (row_n - 1)
+      else
+        clear_full_rows (clear_full_cols brd col_acc) row_acc
 
-  let check_block brd block loc =
-    match loc with
-    | (x,y) ->
-      match block with
-      | Block (c, x_block, y_block) ->
-        let x_val = x + x_block in
-        let y_val = y + y_block in
-        if block_from_location brd (x_val, y_val) = Empty then true else false
-      | Empty -> failwith "Imposible"
-
-  let rec place_shape brd original_brd shape_blocks loc =
-    try 
-      (match shape_blocks with
-       | [] -> brd
-       | x::s -> 
-         if check_block brd x loc 
-         then place_shape (edit_board brd x loc) original_brd s loc 
-         else original_brd)
-    with Invalid_argument _ -> raise InvalidPlacement
-
+  let board_changes (brd1 : t) (brd2 : t) (acc:int) = 
+    List.fold_left (fun acc ((x,y),b) -> 
+        if (List.assoc (x,y) brd1) <> b && b = Empty then acc + 1 
+        else acc) acc brd2
 
   let rec print_board brd row col =
-    if row >= 10 then (print_string "\n";)
+    if row >= 10 then 
+      begin
+        print_string "0 1 2 3 4 5 6 7 8 9";
+        print_string "\n"
+      end
     else if col >= 10 then 
       begin 
-        print_string "\n";
+        print_int (row);
+        print_string "\n"; 
         print_board brd (row + 1) 0
       end
     else 
@@ -124,7 +193,7 @@ module ShapeQueue : ShapeQueueSig = struct
     print_row blocks 1 0; print_string "\n";
     print_row blocks 2 0; print_string "\n";
     print_row blocks 3 0; print_string "\n";
-    print_row blocks 4 0
+    print_row blocks 4 0; print_string "\n"; print_string "\n"
 
   let rec print_queue t = 
     match t with
@@ -153,15 +222,28 @@ let board_from_state st =
 let queue_from_state st = 
   st.current_queue
 
+let increment_score st s = {
+  current_score = (score_from_state st) + s; 
+  current_board = board_from_state st; 
+  current_queue = queue_from_state st
+}
+
+
 type result = Legal of state | Illegal
 
 let step_place st shp loc =
   try
-    let new_board = Board.place_shape (board_from_state st) 
-        (board_from_state st) (blocks_of_shape shp) loc in
+    let current_board = board_from_state st in
+    let blocks = blocks_of_shape shp in
+    let new_board = Board.place_shape current_board blocks loc in
+    let new_board_cleared = Board.clear_board new_board loc [] [] 5 5 in
     let new_queue = ShapeQueue.replace (queue_from_state st) in
-    Legal {current_score = score_from_state st; 
-           current_board = new_board; current_queue = new_queue;}
+    Legal {
+      current_score = (score_from_state st) + 1 + 
+                      (Board.board_changes new_board new_board_cleared 0); 
+      current_board = new_board_cleared; 
+      current_queue = new_queue;
+    }
   with InvalidPlacement -> Illegal
 
 
