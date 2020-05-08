@@ -4,7 +4,7 @@ MLS=$(MODULES:=.ml)
 MLIS=$(MODULES:=.mli)
 TEST=test.byte
 MAIN=main.byte
-OCAMLBUILD=ocamlbuild -use-ocamlfind
+OCAMLBUILD=ocamlbuild -use-ocamlfind 
 
 default: build
 	utop
@@ -13,17 +13,11 @@ build:
 	$(OCAMLBUILD) $(OBJECTS)
 
 test:
-	$(OCAMLBUILD) -tag 'debug' $(TEST) && ./$(TEST)
+	$(OCAMLBUILD) -tag 'debug' $(TEST)  && ./$(TEST)
+
 
 play:
 	$(OCAMLBUILD) $(MAIN) && ./$(MAIN)
-
-check:
-	bash checkenv.sh && bash checktypes.sh
-	
-# finalcheck: check
-# 	bash checkzip.sh
-# 	bash finalcheck.sh
 
 zip:
 	zip block.zip *.ml* _tags INSTALL.txt Makefile

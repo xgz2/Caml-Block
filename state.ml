@@ -35,7 +35,8 @@ module Board : BoardSig = struct
     in
     new_board 0 [] 10
 
-  let board_size = init_board |> List.length |> float_of_int |> sqrt |> int_of_float
+  let board_size = init_board |> List.length 
+                   |> float_of_int |> sqrt |> int_of_float
 
   let block_from_location brd loc =
     try List.assoc loc brd with Not_found -> raise InvalidPlacement
@@ -64,6 +65,7 @@ module Board : BoardSig = struct
       then place_shape (edit_block_of_board brd x loc) s loc 
       else raise InvalidPlacement
 
+  (** [check_shape_list brd coord shp_lst] is if [shp_list] is empty. *)
   let rec check_shape_list brd coord shp_list =
     match shp_list with
     | [] -> true
@@ -82,17 +84,24 @@ module Board : BoardSig = struct
       board_full brd 0 (row + 1) shp
     else true
 
-  (** Requires [row] is a valid row in the board. *)
+  (** [check_full_row brd row] is [Some row] if row [row] on board [brd] is 
+      full. Otherwise it is [None].
+      Requires [row] is a valid row in the board. *)
   let check_full_row brd row =
     if (List.length (List.filter (fun ((x, y), b) -> y = row && b <> Empty) brd) 
         = board_size)
     then Some row else None
 
+  (** [check_full_col brd col] is [Some col] if col [col] on board [brd] is 
+      full. Otherwise it is [None].
+      Requires [col] is a valid col in the board. *)
   let check_full_col brd col =
     if (List.length (List.filter (fun ((x, y), b) -> x = col && b <> Empty) brd) 
         = board_size)
     then Some col else None
 
+  (** [clear_full_rows brd row_lst] is the board with all blocks in the rows of 
+      [row_lst] equal to Empty. *)
   let rec clear_full_rows brd row_lst = 
     match row_lst with
     | [] -> brd
@@ -100,7 +109,8 @@ module Board : BoardSig = struct
         if y = h then ((x,y), Empty)::acc 
         else ((x,y),b)::acc) [] brd) t
 
-
+  (** [clear_full_cols brd row_lst] is the board with all blcoks in the cols of
+      [col_lst] equal to Empty. *)
   let rec clear_full_cols brd col_lst = 
     match col_lst with
     | [] -> brd
@@ -108,24 +118,28 @@ module Board : BoardSig = struct
         if x = h then ((x,y), Empty)::acc 
         else ((x,y),b)::acc) [] brd) t
 
-
-  let rec clear_board (brd:t) (loc:coord) (col_acc:int list) (row_acc:int list) (col_n:int) (row_n:int) : t = 
+  let rec clear_board (brd:t) (loc:coord) (col_acc:int list) (row_acc:int list) 
+      (col_iterations:int) (row_iterations:int) : t = 
     match loc with
     | (col, row) -> 
-      if (col < board_size && col_n > 0) then
+      if (col < board_size && col_iterations > 0) then
         match check_full_col brd col with
-        | None -> clear_board brd (col + 1, row) col_acc row_acc (col_n - 1) row_n 
-        | Some c -> clear_board brd (col + 1, row) (c::col_acc) row_acc (col_n - 1) row_n 
-      else if (row < board_size && row_n > 0) then
+        | None -> clear_board brd (col + 1, row) col_acc row_acc 
+                    (col_iterations - 1) row_iterations 
+        | Some c -> clear_board brd (col + 1, row) (c::col_acc) row_acc 
+                      (col_iterations - 1) row_iterations 
+      else if (row < board_size && row_iterations > 0) then
         match check_full_row brd row with
-        | None -> clear_board brd (col, row + 1) col_acc row_acc col_n (row_n - 1)
-        | Some r -> clear_board brd (col, row + 1) col_acc (r::row_acc) col_n (row_n - 1)
+        | None -> clear_board brd (col, row + 1) col_acc row_acc 
+                    col_iterations (row_iterations - 1)
+        | Some r -> clear_board brd (col, row + 1) col_acc (r::row_acc) 
+                      col_iterations (row_iterations - 1)
       else
         clear_full_rows (clear_full_cols brd col_acc) row_acc
 
   let board_changes (brd1 : t) (brd2 : t) (acc:int) = 
     List.fold_left (fun acc ((x,y),b) -> 
-        if (List.assoc (x,y) brd1) <> b && b = Empty then acc + 1 
+        if (List.assoc (x,y) brd1) <> b then acc + 1 
         else acc) acc brd2
 
   let rec print_board brd row col =
@@ -152,7 +166,7 @@ end
 module type ShapeQueueSig = sig
   type t
   val rep_ok : t -> unit
-  val init_queue : t
+  val init_queue : unit -> t
   val get : t -> shape
   val replace : t -> t
   val print_queue : t -> unit
@@ -163,14 +177,15 @@ module ShapeQueue : ShapeQueueSig = struct
 
   let rep_ok t = assert (List.length t = 3)
 
-  let init_queue = [rand_shape (); rand_shape (); rand_shape ()]
+  let init_queue () = Random.self_init (); 
+    [rand_shape (); rand_shape (); rand_shape ()]
 
   let get = function
     | x::s -> x
     | _ -> failwith "ShapeQueue Error: Empty ShapeQueue"
 
   let replace = function
-    | x::s -> (rand_shape ())::(s |> List.rev) |> List.rev
+    | x::s -> s |> List.rev |> List.cons (rand_shape ()) |> List.rev
     | _ -> failwith "ShapeQueue Error: Empty ShapeQueue"
 
   let rec print_row blk_lst row col =
@@ -210,7 +225,7 @@ type state = {
 let init_state = {
   current_score = 0; 
   current_board = Board.init_board; 
-  current_queue = ShapeQueue.init_queue;
+  current_queue = ShapeQueue.init_queue ();
 }
 
 let score_from_state st =
@@ -227,7 +242,6 @@ let increment_score st s = {
   current_board = board_from_state st; 
   current_queue = queue_from_state st
 }
-
 
 type result = Legal of state | Illegal
 

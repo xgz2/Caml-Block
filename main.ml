@@ -8,7 +8,7 @@ open Board
 let rec repl st =
   print_string "\n\n";
   if board_full (board_from_state st) 0 0 (st |> queue_from_state |> get) 
-  then ANSITerminal.(print_string [red] "Game Over."); ignore(exit 0);
+  then (ANSITerminal.(print_string [red] "Game Over."); exit 0);
   print_string ("Score: " ^ (string_of_int (score_from_state st)));
   print_string "\n\n";
   print_board (board_from_state st) 0 0;

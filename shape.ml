@@ -83,7 +83,7 @@ let string_of_block blk =
     match c with
     | Blue -> Emoji.blue_heart
     | Green -> Emoji.green_salad
-    | Red -> Emoji.red_heart
+    | Red -> Emoji.red_apple
     | Orange -> Emoji.orange_book
     | Yellow -> Emoji.full_moon_with_face
     | Purple -> Emoji.purple_heart

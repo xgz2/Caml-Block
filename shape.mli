@@ -35,11 +35,14 @@ type shape =
   | SymmetricalLTwo  
   | SymmetricalLThree 
 
-(** [rand_shape] is a random shape randomly selected from all 13 shapes. *)
+(** [rand_shape] is a random shape randomly selected from all 13 
+    different shapes. *)
 val rand_shape : unit -> shape
 
-(** [blocks_of_shape] is the creation of the 13 shapes from their respective blocks. *)
+(** [blocks_of_shape] is the creation of the 13 shapes from their 
+    respective blocks. *)
 val blocks_of_shape : shape -> block list
 
-(** [string_of_block b] is the emoji associated with a block of certain color.*)
+(** [string_of_block b] is the emoji associated with a block of 
+    certain color. *)
 val string_of_block : block -> string
