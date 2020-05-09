@@ -1,9 +1,9 @@
-This instruction guide assumes the user has opam and other OCaml dependencies
-as required by CS3110 in SP20. This guide also assumes an OSX based system, 
-although the game will also be compatable with other OS systems.
+Welcome to Caml Blocks! 
 
+These instructions assume a system with the opam installation required by the
+Spring 2020 semester of CS3110. Thank you!
 
-1. Run in terminal [opam update]
-2. Run in terminal [opam upgrade]
-3. Run in terminal [opam install emoji]
-4. Run [make play]
+1. Open terminal
+2. Run [make opam]
+3. Run [make play]
+4. Follow the instructions within terminal

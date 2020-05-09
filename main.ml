@@ -49,7 +49,7 @@ let main () =
                   \nwhile we show you three future shapes, you can only
                   \nplace the left most one. When placing a shape, you will 
                   \nspecify the location of its top left corner. 
-                  \nThe command to place is 'place column# row#'!
+                  \nThe command to place is 'place [column#] [row#]'!
                   \nHappy placing!"
                );
   ignore(parse_start ());

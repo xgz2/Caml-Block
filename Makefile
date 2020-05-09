@@ -19,6 +19,14 @@ test:
 play:
 	$(OCAMLBUILD) $(MAIN) && ./$(MAIN)
 
+
+opam:
+	opam install -y utop ounit qtest yojson lwt lwt_ppx menhir ansiterminal lambda-term merlin ocp-indent user-setup bisect_ppx-ocamlbuild
+	opam user-setup install
+	opam update
+	opam upgrade
+	opam install emoji
+	
 zip:
 	zip block.zip *.ml* _tags INSTALL.txt Makefile
 	
