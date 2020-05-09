@@ -1,7 +1,7 @@
 open Shape
 open State
 
-type command_phrase = string list
+type command_phrase = int list
 
 type command = 
   | Place of command_phrase
@@ -18,6 +18,10 @@ let parse str =
   match word_list with
   | [] -> raise Empty
   | h::t ->
-    if h = "place" && list_length = 3 then Place t
-    else if h = "quit" && list_length = 1 then Quit
-    else raise Malformed
+    try
+      if h = "place" && list_length = 3 then 
+        Place [(t |> List.hd |> int_of_string); 
+               (t |> List.tl |> List.hd |> int_of_string)]
+      else if h = "quit" && list_length = 1 then Quit
+      else raise Malformed
+    with Failure _ -> raise Malformed

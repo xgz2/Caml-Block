@@ -15,7 +15,7 @@ module type BoardSig = sig
   val check_block_placement : t -> block -> coord -> bool
   val place_shape : t -> block list -> coord -> t
   val board_full : t -> int -> int -> shape -> bool
-  val clear_board : t -> coord -> int list -> int list -> int -> int -> t
+  val clear_board : t -> coord -> t
   val board_changes : t -> t -> int -> int
   val print_board : t -> int -> int -> unit
 end
@@ -118,24 +118,33 @@ module Board : BoardSig = struct
         if x = h then ((x,y), Empty)::acc 
         else ((x,y),b)::acc) [] brd) t
 
-  let rec clear_board (brd:t) (loc:coord) (col_acc:int list) (row_acc:int list) 
+  (** [clear_board t loc col_acc row_acc col_n and row_n] is the board with all
+      full rows or columns set to empty. Board [t] is the board to change. Coord
+      [loc] is the location when analysis of changes begins. Int [col_n] is the
+      number of columns that the function checks (for time efficiency) and 
+      similarly for [row_n] and rows. 
+      Requires: [row_acc] = [[]] and [col_acc] = [[]]. *)
+  let rec clear_board_aux (brd:t) (loc:coord) (col_acc:int list) (row_acc:int list) 
       (col_iterations:int) (row_iterations:int) : t = 
     match loc with
     | (col, row) -> 
       if (col < board_size && col_iterations > 0) then
         match check_full_col brd col with
-        | None -> clear_board brd (col + 1, row) col_acc row_acc 
+        | None -> clear_board_aux brd (col + 1, row) col_acc row_acc 
                     (col_iterations - 1) row_iterations 
-        | Some c -> clear_board brd (col + 1, row) (c::col_acc) row_acc 
+        | Some c -> clear_board_aux brd (col + 1, row) (c::col_acc) row_acc 
                       (col_iterations - 1) row_iterations 
       else if (row < board_size && row_iterations > 0) then
         match check_full_row brd row with
-        | None -> clear_board brd (col, row + 1) col_acc row_acc 
+        | None -> clear_board_aux brd (col, row + 1) col_acc row_acc 
                     col_iterations (row_iterations - 1)
-        | Some r -> clear_board brd (col, row + 1) col_acc (r::row_acc) 
+        | Some r -> clear_board_aux brd (col, row + 1) col_acc (r::row_acc) 
                       col_iterations (row_iterations - 1)
       else
         clear_full_rows (clear_full_cols brd col_acc) row_acc
+
+  let clear_board brd loc =
+    clear_board_aux brd loc [] [] 10 10
 
   let board_changes (brd1 : t) (brd2 : t) (acc:int) = 
     List.fold_left (fun acc ((x,y),b) -> 
@@ -170,6 +179,7 @@ module type ShapeQueueSig = sig
   val get : t -> shape
   val replace : t -> t
   val print_queue : t -> unit
+  val list_of_queue : t -> shape list
 end
 
 module ShapeQueue : ShapeQueueSig = struct
@@ -214,6 +224,9 @@ module ShapeQueue : ShapeQueueSig = struct
     match t with
     | [] -> print_string "\n"
     | x::s -> print_shape x; print_queue s 
+
+  let list_of_queue (t : t) = 
+    List.filter (fun x -> x = x) t
 end
 
 type state = {
@@ -250,7 +263,7 @@ let step_place st shp loc =
     let current_board = board_from_state st in
     let blocks = blocks_of_shape shp in
     let new_board = Board.place_shape current_board blocks loc in
-    let new_board_cleared = Board.clear_board new_board loc [] [] 5 5 in
+    let new_board_cleared = Board.clear_board new_board loc in
     let new_queue = ShapeQueue.replace (queue_from_state st) in
     Legal {
       current_score = (score_from_state st) + 1 + 

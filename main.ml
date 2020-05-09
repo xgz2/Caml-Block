@@ -26,8 +26,8 @@ let rec repl st =
   (* [coords] is guaranteed to be non-empty and of length 2. *)
   | Place coords -> 
     let shp = st |> queue_from_state |> get in
-    let x_coord = int_of_string (List.hd coords) in
-    let y_coord = int_of_string (List.hd(List.tl coords)) in
+    let x_coord = (List.hd coords) in
+    let y_coord = (List.hd(List.tl coords)) in
     match (step_place st shp (x_coord, y_coord)) with
     | Legal st' -> repl st'
     | Illegal -> print_endline "Illegal coordinates. Please try again."; 

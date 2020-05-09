@@ -40,20 +40,18 @@ module type BoardSig = sig
       Requires: [col] and [row] are 0. *)
   val board_full : t -> int -> int -> shape -> bool
 
-  (** [clear_board t loc col_acc row_acc col_n and row_n] is the board with all
-      full rows or columns set to empty. 
-      Requires: col_acc = [], row_acc = [], col_n and row_n are equal to the 
-      maximum height or width of shapes in the version of the game. *)
-  val clear_board : t -> coord -> int list -> int list -> int -> int -> t
+  (** [clear_board t loc] is the board with all full rows or columns set to 
+      empty. [loc] is the location of a shape placement when this is called. *)
+  val clear_board : t -> coord -> t
 
-  (** [board_changes brd1 brd2 acct] is the integer number of block changes from 
-      [brd1] to [brd2]. *)
+  (** [board_changes brd1 brd2 acc] is the integer number of block changes from 
+      [brd1] to [brd2]. Requires [acc = 0]. *)
   val board_changes : t -> t -> int -> int
 
   (** [print_board brd row col] is printing of the current game board. *)
   val print_board : t -> int -> int -> unit
-end
 
+end
 module Board : BoardSig
 
 (** [ShapeQueueSig] is the type of a queue of shapes. *)
@@ -81,6 +79,9 @@ module type ShapeQueueSig = sig
   (** [print_queue t] prints the current ShapeQueueSig to the terminal
       and returns [unit]. *)
   val print_queue : t -> unit
+
+  (** [list_of_queue t] is the ShapeQueue [t] as a list. *)
+  val list_of_queue: t -> shape list
 end
 
 module ShapeQueue : ShapeQueueSig
