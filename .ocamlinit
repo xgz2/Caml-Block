@@ -1,0 +1,7 @@
+#require "oUnit";;
+#require "ANSITerminal";;
+#require "Emoji";;
+#directory "_build";;
+#load "shape.cmo";;
+#load "command.cmo";;
+#load "state.cmo";;
