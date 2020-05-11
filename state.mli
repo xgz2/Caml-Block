@@ -3,17 +3,22 @@ open Shape
 (** [score] is the type of the numerical score of the current state. *)
 type score = int
 
-exception InvalidPlacement
-
 (** [coord] is the type of a coordinate on the board. *)
 type coord = int * int
 
-(** [BoardSig] is the type of a board. *)
+(** Raised when the user attempts an invalid placement of a shape. For example,
+    placing off the board or placing at a non-coordinate value. *)
+exception InvalidPlacement
+
+(** A [BoardSig] contains empty blocks and other blocks representing free spaces 
+    for the player to place shapes or blocks the player has placed but have not 
+    been cleared yet. *)
 module type BoardSig = sig
 
+  (** The type of a board. *)
   type t 
 
-  (** [init_board] is the initial empty board. *)
+  (** [init_board] is the initial empty board of dimension 10. *)
   val init_board : t
 
   (** [block_from_location t coord] is the block associated with location 
@@ -41,22 +46,30 @@ module type BoardSig = sig
   val board_full : t -> int -> int -> shape -> bool
 
   (** [clear_board t loc] is the board with all full rows or columns set to 
-      empty. [loc] is the location of a shape placement when this is called. *)
+      empty. This only considered rows below the y coordinate of [loc] and right
+      of the x coordinate of [loc]. This is for the purpose of efficency in 
+      board clearing. [loc] is the location of a shape placement when this is 
+      called. *)
   val clear_board : t -> coord -> t
 
   (** [board_changes brd1 brd2 acc] is the integer number of block changes from 
-      [brd1] to [brd2]. Requires [acc = 0]. *)
+      [brd1] to [brd2]. 
+      Requires: [acc = 0]. *)
   val board_changes : t -> t -> int -> int
 
-  (** [print_board brd row col] is printing of the current game board. *)
+  (** [print_board brd row col] is prints board [t] to the terminal. *)
   val print_board : t -> int -> int -> unit
 
 end
 module Board : BoardSig
 
-(** [ShapeQueueSig] is the type of a queue of shapes. *)
+(** A [ShapeQueueSig] represents a list of exactly three shapes. The first shape
+    is the shape that the player may select to place, and the two additional
+    shapes are the shapes that will be allocated for the user to place in the
+    next two rounds of the game respectively.  *)
 module type ShapeQueueSig = sig
 
+  (** The type of queues of shapes. *)
   type t
 
   (** [rep_ok] asserts that the representation of a shape queue is valid.

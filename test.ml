@@ -20,16 +20,20 @@ open ShapeQueue
    be used during the testing of other exposed functions so we can have a high 
    degree of confidence. We also did not test exposed functions made 
    specifically for testing purposes. We did not test print functions with OUnit 
-   and instead tested through play testing.We did not test the functions in 
-   Shape with OUnit because one returns a random shape, one returns a block list
-   that had to be manually coded, and another returns emoji representations that 
-   had to be manually coded. Instead, these were tested through extensive play 
-   testing to ensure that shapes were indeed random (and all shapes appeared), 
-   shapes appeared in the correct orientation, and the proper emojis displayed.
-   Finally, we believe that our test suite gives proper confidence to the 
-   proper function of our game because not only does the game hold proper 
-   through many play tests but also our tests for the function of nearly all of 
-   our functions holds correct. *)
+   and instead tested through play testing to ensure that representation of 
+   boards, shapes, and queues printed as one would expect. We did not test the 
+   functions in Shape with OUnit because one returns a random shape, one returns 
+   a block list that had to be manually coded, and another returns emoji 
+   representations that had to be manually coded. Instead, these were tested 
+   through extensive play testing to ensure that shapes were indeed random 
+   (and all shapes appeared), shapes appeared in the correct orientation, and 
+   the proper emojis displayed. Finally, we believe that our test suite gives 
+   proper confidence to the correct function of our game because not only does 
+   the game hold proper through many play tests but also our tests for the 
+   function of nearly all of our functions holds correct to the expected output.
+   These play tests and unit tests give us a high level of confidence that our 
+   system fulfills our spec and ergo all purposes we designated.
+*)
 
 
 let board_1x1 = edit_block_of_board init_board (Block (Blue, 0,0)) (0,0)
@@ -268,16 +272,8 @@ let tests = [
       assert_raises InvalidPlacement 
         (fun _ -> block_from_location init_board (20,20)))
 ]
-(* TODO:
-   7. Other code maintenance & quality improvements 
-   8 (Optional). Shape queue on one line. Implement timer
-   9. Submit!
-*)
 
 
 let suite = "suite" >::: tests
-
-(* let () = print_int (board_changes init_board full_board 0)
-   let () = print_int (board_changes init_board (clear_board full_board (0,0) [] [] 10 10) 0) *)
 
 let () = run_test_tt_main suite

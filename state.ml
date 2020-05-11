@@ -24,17 +24,20 @@ module Board : BoardSig = struct
 
   type t = (coord * block) list
 
+  (** [new_board row acc size] is a new empty game board of [size] rows and 
+      [size] columns. *)
+  let rec new_board row acc size =
+    let rec step_row col acc size =
+      if col >= size then acc
+      else step_row (col + 1) (((col, row), Empty)::acc) size in
+    if row >= size then acc
+    else new_board (row + 1) ((step_row 0 [] size) @ acc) size
+
   let init_board = 
-    let rec new_board row acc size =
-      let rec step_row col acc size =
-        if col >= size then acc
-        else step_row (col + 1) (((col, row), Empty)::acc) size 
-      in
-      if row >= size then acc
-      else new_board (row + 1) ((step_row 0 [] size) @ acc) size
-    in
     new_board 0 [] 10
 
+  (** [board_size] is the width and height of the init_board. The init_board
+      will always be a square. *)
   let board_size = init_board |> List.length 
                    |> float_of_int |> sqrt |> int_of_float
 
@@ -54,8 +57,8 @@ module Board : BoardSig = struct
     | (x, y), Block (c, x_block, y_block) -> 
       let x_val = x + x_block in
       let y_val = y + y_block in
-      if block_from_location brd (x_val, y_val) = Empty then true else false
-    | _, Empty -> failwith "Imposible"
+      block_from_location brd (x_val, y_val) = Empty
+    | _, Empty -> failwith "Failure: Cannot Place Empty Block."
 
   let rec place_shape brd shape_blocks loc =
     match shape_blocks with
@@ -65,19 +68,20 @@ module Board : BoardSig = struct
       then place_shape (edit_block_of_board brd x loc) s loc 
       else raise InvalidPlacement
 
-  (** [check_shape_list brd coord shp_lst] is if [shp_list] is empty. *)
-  let rec check_shape_list brd coord shp_list =
-    match shp_list with
+  (** [block_list_empty brd coord shp_lst] is a helper function to check if 
+      [blk_list] is empty. *)
+  let rec block_list_empty brd coord blk_list =
+    match blk_list with
     | [] -> true
     | x::s -> if check_block_placement brd x coord 
-      then check_shape_list brd coord s 
+      then block_list_empty brd coord s 
       else false
 
   let rec board_full brd col row shp = 
     let blocks = blocks_of_shape shp in
     if col < board_size && row < board_size then 
       try
-        if check_shape_list brd (col,row) blocks then false
+        if block_list_empty brd (col,row) blocks then false
         else board_full brd (col + 1) row shp
       with InvalidPlacement -> board_full brd (col + 1) row shp
     else if row < board_size then
@@ -124,8 +128,8 @@ module Board : BoardSig = struct
       number of columns that the function checks (for time efficiency) and 
       similarly for [row_n] and rows. 
       Requires: [row_acc] = [[]] and [col_acc] = [[]]. *)
-  let rec clear_board_aux (brd:t) (loc:coord) (col_acc:int list) (row_acc:int list) 
-      (col_iterations:int) (row_iterations:int) : t = 
+  let rec clear_board_aux (brd:t) (loc:coord) (col_acc:int list) 
+      (row_acc:int list) (col_iterations:int) (row_iterations:int) : t = 
     match loc with
     | (col, row) -> 
       if (col < board_size && col_iterations > 0) then
@@ -198,27 +202,52 @@ module ShapeQueue : ShapeQueueSig = struct
     | x::s -> s |> List.rev |> List.cons (rand_shape ()) |> List.rev
     | _ -> failwith "ShapeQueue Error: Empty ShapeQueue"
 
+  (** [print_row blk_lst row col] is a helper function for [print_shape] that 
+      prints to the terminal all the blocks of [blk_lst] on row [row]. Column
+      [col] tracks the [col] of the current block being printed. 
+      Requires: [col] = 0. *)
   let rec print_row blk_lst row col =
     match blk_lst with
     | [] -> ()
     | x::s ->
       match x with
-      | Empty -> failwith "Block was empty"
+      | Empty -> failwith "ShapeQueue Error: Block was empty"
       | Block (c, x, y) -> 
         if y = row && x = col then 
-          (print_string (string_of_block (Block(c,x,y))); 
+          (Block(c,x,y) |> string_of_block |> print_string; 
            print_row s row (col +1)) 
         else if y = row && x < col then print_row blk_lst row (col - 1)
         else if y = row then (print_row blk_lst row (col + 1))
         else print_row s row (col + 1)
 
-  let rec print_shape s =
+  (** [print_shape s] is a helper function for [print_queue] that prints the 
+      shape [s] within the queue to the terminal and returns [unit]. *)
+  let print_shape s =
     let blocks = s |> blocks_of_shape in
-    print_row blocks 0 0; print_string "\n";
-    print_row blocks 1 0; print_string "\n";
-    print_row blocks 2 0; print_string "\n";
-    print_row blocks 3 0; print_string "\n";
-    print_row blocks 4 0; print_string "\n"; print_string "\n"
+    begin
+      match s with 
+      | OneByOne  |TwoByOne |ThreeByOne |FourByOne |FiveByOne ->
+        print_row blocks 0 0;
+      | OneByTwo |TwoByTwo |SymmetricalLTwo ->
+        print_row blocks 0 0; print_string "\n";
+        print_row blocks 1 0;
+      | OneByThree |ThreeByThree |SymmetricalLThree -> 
+        print_row blocks 0 0; print_string "\n";
+        print_row blocks 1 0; print_string "\n";
+        print_row blocks 2 0;
+      | OneByFour -> 
+        print_row blocks 0 0; print_string "\n";
+        print_row blocks 1 0; print_string "\n";
+        print_row blocks 2 0; print_string "\n";
+        print_row blocks 3 0;
+      | OneByFive ->
+        print_row blocks 0 0; print_string "\n";
+        print_row blocks 1 0; print_string "\n";
+        print_row blocks 2 0; print_string "\n";
+        print_row blocks 3 0; print_string "\n";
+        print_row blocks 4 0;
+    end;
+    print_string "\n"; print_string "\n"
 
   let rec print_queue t = 
     match t with
@@ -250,6 +279,9 @@ let board_from_state st =
 let queue_from_state st = 
   st.current_queue
 
+(** [increment_score st s] is a state that is the same as state [s] but with
+    the [current_score] property modified to be the previous score plus score 
+    [s]. *)
 let increment_score st s = {
   current_score = (score_from_state st) + s; 
   current_board = board_from_state st; 

@@ -1,9 +1,8 @@
 open Shape
-open State
 open Command
+open State
 open ShapeQueue
 open Board
-
 
 let rec repl st =
   print_string "\n\n";
@@ -35,7 +34,7 @@ let rec repl st =
 
 let parse_start () =
   print_endline "\n\nWould you like to begin now (y/n)?";
-  print_string "\n_>";
+  print_string "\n>_";
   let response = read_line() in
   if response = "y" then (print_string "Great!";)
   else (print_string "ok"; exit 0)

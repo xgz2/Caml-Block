@@ -19,14 +19,13 @@ exception Malformed
 
 (** [parse str] is a command that is parsed from [str] into a verb and an 
     command_phrase. Every word is a string of characters with no space 
-    character.
-    The first word is the verb and the rest of the [str], if not
+    characters. The first word is the verb and the rest of the [str], if not
     empty, becomes the command_phrase.
     Requires: [str] must be of ASCII character codes 0-9, 32, 65-90, 97-122.
     Raises: [Empty] if [str] contains nothing but space or none at all.
     Raises: [Malformed] if 
     1) verb is not "quit" or "place", 
     or 2) if verb is "quit" with some command_phrase, 
-    or 3) if verb is "place" but there is no command_phrase. 
-    or 4) if verb "place" follows two non-integer arguments. *)
+    or 3) if verb is "place" but there is no command_phrase,
+    or 4) if verb "place" follows one or two non-integer argument(s). *)
 val parse : string -> command

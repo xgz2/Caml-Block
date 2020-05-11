@@ -5,7 +5,7 @@ Spring 2020 semester of CS3110. Thank you!
 
 1. Open terminal
 2. Run [make opam]
-3. Run [make play]
+3. Run [make play]. (We recommend doing playing in "full screen" terminal mode).
 4. Follow the instructions below
 
 

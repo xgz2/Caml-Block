@@ -19,7 +19,7 @@ type block =
   | Empty
   | Block of color * h_off * v_off
 
-(** [shapes] is the type of a playable shape. *)
+(** [shape] is the type of a playable shape. *)
 type shape = 
   | OneByOne  
   | TwoByTwo  
