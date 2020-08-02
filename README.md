@@ -2,7 +2,7 @@
 Welcome to Caml Blocks! 
 
 This game was created by Ling Cao and George (Xiaoming) Zhuang as a final
-project for the CS3110: Data Structure and Functional Programming (SP20) at Cornell University. In this text file, you will find an installation guide and some helpful instructions. Theses instructions are designed for an OSX based system, although the game will also run on other systems with some different installation properties. For other systems, a guide can be found on the CS3110 website (https://www.cs.cornell.edu/courses/cs3110/2020sp/install.html) for the basic OCaml installation. Thank you for playing, and we hope you enjoy!
+project for the CS3110: Data Structures and Functional Programming (SP20) at Cornell University. In this text file, you will find an installation guide and some helpful instructions. Theses instructions are designed for an OSX based system, although the game will also run on other systems with some different installation properties. For other systems, a guide can be found on the CS3110 website (https://www.cs.cornell.edu/courses/cs3110/2020sp/install.html) for the basic OCaml installation. Thank you for playing, and we hope you enjoy!
 
 # Acknowledgements
 - Thank you to Professor Nate Foster and the CS3110 Course team for their efforts this semester.
